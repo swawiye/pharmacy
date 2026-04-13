@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>PharmTrack</h1>
+      </div>
+      <div>
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          Dashboard
+        </div>
+        <div class="nav-item" onclick="showPage('medicines')">
+          Medicines
+          <span class="nav-badge" id="low-stock-badge" style="display:none">!</span>
+        </div>
+        <div class="nav-item" onclick="showPage('sales')">
+          Sales
+        </div>
+        <div class="nav-item" onclick="showPage('categories')">
+          Categories
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Dashboard</div>
+        <div class="topbar-right">
+          <div class="user-chip">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- Dashboard -->
+        <div class="page active" id="page-dashboard">
+          <div class="page-header">
+            <div class="page-header-left">
+              <h2>Dashboard</h2>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="stats-grid">
+            <div class="loading"><div class="spinner"></div> Loading…</div>
+          </div>
+
+          <div class="dash-grid">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">⚠️ Low Stock Alerts</span>
+              </div>
+              <div class="card-body" id="low-stock-list">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">🛒 Recent Sales</span>
+              </div>
+              <div class="card-body" id="recent-sales-list">
+                <div class="loading"><div class="spinner"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medicines -->
+        <div class="page" id="page-medicines">
+          <div class="page-header">
+            <div class="page-header-left">
+              <h2>💊 Medicines</h2>
+              <p>Manage your medicine inventory</p>
+            </div>
+            <button class="btn btn-primary" onclick="openMedicineModal()">Add Medicine +</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar" style="margin:0; width:100%;">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="med-search" placeholder="Search medicines…" oninput="loadMedicines()">
+                </div>
+                <select class="filter-select" id="med-category-filter" onchange="loadMedicines()">
+                  <option value="">All Categories</option>
+                </select>
+                <select class="filter-select" id="med-stock-filter" onchange="loadMedicines()">
+                  <option value="">All Stock</option>
+                  <option value="low">Low Stock</option>
+                  <option value="out">Out of Stock</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Medicine</th>
+                    <th>Category</th>
+                    <th>Batch</th>
+                    <th>Qty</th>
+                    <th>Purchase Price</th>
+                    <th>Selling Price</th>
+                    <th>Expiry</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="medicines-table-body">
+                  <tr><td colspan="10"><div class="loading"><div class="spinner"></div> Loading…</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales -->
+        <div class="page" id="page-sales">
+          <div class="page-header">
+            <div class="page-header-left">
+              <h2>🛒 Sales</h2>
+              <p>Record and view medicine sales</p>
+            </div>
+            <button class="btn btn-primary" onclick="openSaleModal()">Record Sale +</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar" style="margin:0; width:100%;">
+                <label style="font-size:12px; color:var(--text-muted)">From</label>
+                <input type="date" id="sales-date-from" style="width:auto;" onchange="loadSales()">
+                <label style="font-size:12px; color:var(--text-muted)">To</label>
+                <input type="date" id="sales-date-to" style="width:auto;" onchange="loadSales()">
+                <button class="btn btn-outline btn-sm" onclick="clearSalesFilter()">Clear</button>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Medicine</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                    <th>Customer</th>
+                    <th>Sold By</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="sales-table-body">
+                  <tr><td colspan="8"><div class="loading"><div class="spinner"></div>Loading…</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="page" id="page-categories">
+          <div class="page-header">
+            <div class="page-header-left">
+              <h2>🏷️ Categories</h2>
+              <p>Manage medicine categories</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCategoryModal()">Add Category +</button>
+          </div>
+          <div class="card">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body">
+                  <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Loading…</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Medicine Modal -->
+    <div class="modal-overlay" id="medicine-modal">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <span class="modal-title" id="medicine-modal-title">Add Medicine</span>
+          <button class="modal-close" onclick="closeModal('medicine-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="medicine-form-alert"></div>
+          <form id="medicine-form">
+            <input type="hidden" id="med-id">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Medicine Name *</label>
+                <input type="text" id="med-name" placeholder="e.g. Amoxicillin 500mg" required>
+              </div>
+              <div class="form-group">
+                <label>Generic Name</label>
+                <input type="text" id="med-generic" placeholder="e.g. Amoxicillin">
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select id="med-category">
+                  <option value=""> — Select Category — </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Batch Number</label>
+                <input type="text" id="med-batch" placeholder="e.g. AMX2024A">
+              </div>
+              <div class="form-group">
+                <label>Unit</label>
+                <select id="med-unit">
+                  <option value="pcs">Pieces</option>
+                  <option value="tabs">Tablets</option>
+                  <option value="caps">Capsules</option>
+                  <option value="ml">Millilitres</option>
+                  <option value="mg">Milligrams</option>
+                  <option value="bottles">Bottles</option>
+                  <option value="vials">Vials</option>
+                  <option value="sachets">Sachets</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Quantity in Stock *</label>
+                <input type="number" id="med-quantity" min="0" value="0" required>
+              </div>
+              <div class="form-group">
+                <label>Low Stock Threshold</label>
+                <input type="number" id="med-threshold" min="1" value="10">
+              </div>
+              <div class="form-group">
+                <label>Purchase Price (KES)</label>
+                <input type="number" id="med-purchase-price" min="0" step="0.01" value="0">
+              </div>
+              <div class="form-group">
+                <label>Selling Price (KES)</label>
+                <input type="number" id="med-selling-price" min="0" step="0.01" value="0">
+              </div>
+              <div class="form-group">
+                <label>Expiry Date</label>
+                <input type="date" id="med-expiry">
+              </div>
+              <div class="form-group full">
+                <label>Description</label>
+                <textarea id="med-description" placeholder="Optional notes about this medicine…"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('medicine-modal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveMedicine()">Save Medicine</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sale Modal -->
+    <div class="modal-overlay" id="sale-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">Record New Sale</span>
+          <button class="modal-close" onclick="closeModal('sale-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="sale-form-alert"></div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Medicine *</label>
+              <select id="sale-medicine" onchange="fillSalePrice()">
+                <option value=""> — Select Medicine — </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Quantity *</label>
+              <input type="number" id="sale-qty" min="1" value="1">
+            </div>
+            <div class="form-group">
+              <label>Unit Price (KES)</label>
+              <input type="number" id="sale-price" min="0" step="0.01" value="0">
+            </div>
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="sale-customer" placeholder="Optional">
+            </div>
+            <div class="form-group">
+              <label>Sold By</label>
+              <input type="text" id="sale-by" placeholder="Staff name" value="Admin">
+            </div>
+            <div class="form-group full">
+              <div class="alert alert-info" id="sale-total-display" style="background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark);">
+                Total: <strong>KES 0.00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('sale-modal')">Cancel</button>
+          <button class="btn btn-success" onclick="recordSale()">Record Sale</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal-overlay" id="category-modal">
+      <div class="modal" style="max-width:440px">
+        <div class="modal-header">
+          <span class="modal-title" id="category-modal-title">Add Category</span>
+          <button class="modal-close" onclick="closeModal('category-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="category-form-alert"></div>
+          <div class="form-grid">
+            <input type="hidden" id="category-id">
+            <div class="form-group full">
+              <label>Category Name *</label>
+              <input type="text" id="category-name" placeholder="e.g. Antibiotics">
+            </div>
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea id="category-desc" placeholder="Optional description…"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('category-modal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveCategory()">Save Category</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+      <div class="modal" style="max-width:380px">
+        <div class="modal-header">
+          <span class="modal-title">Confirm Delete</span>
+          <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirm-message" style="color:var(--text-muted); font-size:14px;"></p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
+            <button class="btn btn-danger" id="confirm-btn">Delete</button>
+          </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="pharmacy.js"></script>
+  </body>
+</html>
