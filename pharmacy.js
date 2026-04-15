@@ -121,57 +121,56 @@ const API = 'api.php';
                 <td style="padding:8px 4px;font-size:13px;font-weight:600;color:var(--success)">KES ${parseFloat(s.total_amount).toLocaleString()}</td>
                 <td style="padding:8px 4px;font-size:11px;color:var(--text-light)">${new Date(s.sale_date).toLocaleDateString()}</td>
               </tr>`).join('') + '</table>';
-        }
+          
+            salesEl.innerHTML = `
+            <table style="width:100%; border-collapse:collapse">
+              ${data.recent_sales.map(s => `
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:10px 4px; font-size:13px;">
+                    <div style="font-weight:500">${s.medicine_name}</div>
+                    <div style="color:var(--text-muted); font-size:11px">${s.sale_date}</div>
+                  </td>
+                  <td style="padding:10px 4px; text-align:right; font-weight:600">
+                    KES ${parseFloat(s.total_amount).toLocaleString()} 
+                  </td>
+                </tr>
+              `).join('')}
+            </table>`;
+        } 
       }
 
       // Medicines
-      async function loadMedicines() {
-        const search   = document.getElementById('med-search')?.value || '';
-        const category = document.getElementById('med-category-filter')?.value || '';
-        const stock    = document.getElementById('med-stock-filter')?.value || '';
+        async function loadMedicines() {
+          const search = document.getElementById('med-search').value;
+          const cat = document.getElementById('med-category-filter').value;
+          const stock = document.getElementById('med-stock-filter').value;
 
-        let url = `dashboard&action=get_medicines`;
-        const params = new URLSearchParams({ action: 'get_medicines', search, category, stock });
-        const data   = await (await fetch(`${API}?${params}`)).json();
-        allMedicines  = data;
+          const data = await api(`medicines&search=${search}&category=${cat}&stock=${stock}`);
+          const tbody = document.getElementById('medicines-table-body');
 
-        const tbody = document.getElementById('medicines-table-body');
-        if (!data.length) {
-          tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🔍</div><p>No medicines found</p></div></td></tr>';
-          return;
+          if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No medicines found.</td></tr>';
+            return;
+          }
+        
+          tbody.innerHTML = data.map((m, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td><strong>${m.name}</strong><br><small>${m.generic_name || ''}</small></td>
+              <td>${m.category_name}</td>
+              <td>${m.batch_number}</td>
+              <td>${m.quantity} ${m.unit}</td>
+              <td>${m.purchase_price}</td>
+              <td>${m.selling_price}</td>
+              <td>${m.expiry_date}</td>
+              <td><span class="badge ${m.status === 'Expired' ? 'badge-danger' : 'badge-success'}">${m.status}</span></td>
+              <td>
+                <button class="btn-icon" onclick="editMedicine(${m.id})">✏️</button>
+                <button class="btn-icon" onclick="deleteMedicine(${m.id})">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
         }
-
-        tbody.innerHTML = data.map((m, i) => {
-          const today = new Date();
-          const expiry = m.expiry_date ? new Date(m.expiry_date) : null;
-          const expired = expiry && expiry < today;
-          const lowStock = m.quantity <= m.low_stock_threshold;
-
-          let statusBadge = '<span class="badge badge-success">In Stock</span>';
-          if (m.quantity === 0) statusBadge = '<span class="badge badge-danger">Out of Stock</span>';
-          else if (expired) statusBadge = '<span class="badge badge-danger">Expired</span>';
-          else if (lowStock) statusBadge = '<span class="badge badge-warning">Low Stock</span>';
-
-          return `<tr>
-            <td style="color:var(--text-muted)">${i+1}</td>
-            <td>
-              <div style="font-weight:600">${m.name}</div>
-              <div style="font-size:11px;color:var(--text-muted)">${m.generic_name || ''}</div>
-            </td>
-            <td><span class="badge badge-info">${m.category_name || '—'}</span></td>
-            <td style="font-size:12px;color:var(--text-muted)">${m.batch_number || '—'}</td>
-            <td><strong>${m.quantity}</strong> <span style="color:var(--text-light);font-size:11px">${m.unit}</span></td>
-            <td>KES ${parseFloat(m.purchase_price).toLocaleString()}</td>
-            <td style="font-weight:600;color:var(--primary)">KES ${parseFloat(m.selling_price).toLocaleString()}</td>
-            <td style="font-size:12px${expired ? ';color:var(--danger)' : ''}">${m.expiry_date ? new Date(m.expiry_date).toLocaleDateString() : '—'}</td>
-            <td>${statusBadge}</td>
-            <td><div class="actions">
-              <button class="btn btn-outline btn-xs" onclick="editMedicine(${m.id})">✏️</button>
-              <button class="btn btn-danger btn-xs" onclick="deleteMedicine(${m.id}, '${m.name}')">🗑️</button>
-            </div></td>
-          </tr>`;
-        }).join('');
-      }
 
       async function openMedicineModal(id = null) {
         document.getElementById('medicine-form').reset();
@@ -210,7 +209,7 @@ const API = 'api.php';
 
       async function saveMedicine() {
         const alertEl = document.getElementById('medicine-form-alert');
-        const data = {
+        const formData = {
           id: document.getElementById('med-id').value,
           name: document.getElementById('med-name').value.trim(),
           generic_name: document.getElementById('med-generic').value.trim(),
@@ -225,11 +224,14 @@ const API = 'api.php';
           description: document.getElementById('med-description').value.trim(),
         };
         if (!data.name) { alertEl.innerHTML = '<div class="alert alert-danger">Medicine name is required.</div>'; return; }
-        const res = await api('save_medicine', 'POST', data);
-        if (res.error) { alertEl.innerHTML = `<div class="alert alert-danger">${res.error}</div>`; return; }
-        closeModal('medicine-modal');
-        toast(res.message, 'success');
-        loadMedicines();
+        const result = await api('save_medicine', 'POST', formData);
+        if (result.success) {
+          toast('Medicine saved successfully', 'success');
+          closeModal('medicine-modal');
+          loadMedicines();
+        } else {
+          toast(result.error || 'Failed to save', 'error');
+        }
         if (currentPage === 'dashboard') loadDashboard();
       }
 
