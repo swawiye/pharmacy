@@ -105,11 +105,15 @@ switch ($action) {
             $conn->query($sql);
             echo json_encode(['success' => true, 'message' => 'Medicine updated successfully']);
         } else {
-            $sql = "INSERT INTO medicines (name, generic_name, category_id, batch_number,
-                quantity, unit, purchase_price, selling_price, expiry_date, low_stock_threshold, description)
-                VALUES ('$name','$generic_name'," . ($category_id ?: 'NULL') . "," . ($expiry_date ? "'$expiry_date'" : 'NULL') . ",$low_stock_threshold,'$description')";
+            $sql = "INSERT INTO drugs (drug_name, generic_name, category, batch_number, 
+                        quantity, unit, purchase_price, selling_price, expiry_date, 
+                        low_stock_threshold, description)
+                        VALUES ('$name', '$generic_name', '$category_id', '$batch_number', 
+                        $quantity, '$unit', $purchase_price, $selling_price, 
+                        " . ($expiry_date ? "'$expiry_date'" : 'NULL') . ", 
+                        $low_stock_threshold, '$description')";
             $conn->query($sql);
-            echo json_encode(['success' => true, 'id' => $conn->insert_id, 'message' => 'Medicine added successfully']);
+            echo json_encode(['success' => true, 'id' => $conn->insert_id]);
         }
         break;
 
