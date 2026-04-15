@@ -248,7 +248,7 @@ const API = 'api.php';
           low_stock_threshold: document.getElementById('med-threshold').value,
           description: document.getElementById('med-description').value.trim(),
         };
-        if (!data.name) { alertEl.innerHTML = '<div class="alert alert-danger">Medicine name is required.</div>'; return; }
+        if (!formData.name) { alertEl.innerHTML = '<div class="alert alert-danger">Medicine name is required.</div>'; return; }
         const result = await api('save_medicine', 'POST', formData);
         if (result.success) {
           toast('Medicine saved successfully', 'success');
