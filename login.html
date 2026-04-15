@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PharmaCare — Sign In</title>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+        <style>
+          *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+          :root {
+            --blue:       #1a56db;
+            --blue-dark:  #1648c0;
+            --blue-light: #e8f0fe;
+            --teal:       #0694a2;
+            --text:       #111928;
+            --muted:      #6b7280;
+            --border:     #e5e7eb;
+            --bg:         #f9fafb;
+            --white:      #ffffff;
+            --red:        #e02424;
+          }
+
+          body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+          }
+
+          /* Left panel */
+          .panel-left {
+            background: linear-gradient(145deg, #0f2460 0%, #1a56db 55%, #0694a2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 56px;
+            position: relative;
+            overflow: hidden;
+          }
+          .panel-left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+          }
+          .panel-left::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; right: -80px;
+            width: 320px; height: 320px;
+            background: rgba(255,255,255,.06);
+            border-radius: 50%;
+          }
+
+          .brand {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 48px;
+          }
+          .brand-icon {
+            width: 52px; height: 52px;
+            background: rgba(255,255,255,.15);
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(8px);
+          }
+          .brand h1 {
+            font-family: 'Lora', serif;
+            font-size: 32px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -.5px;
+            margin-bottom: 8px;
+          }
+          .brand p {
+            font-size: 15px;
+            color: rgba(255,255,255,.65);
+            font-weight: 400;
+          }
+
+          .feature-list {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; gap: 20px;
+          }
+          .feature-item {
+            display: flex; align-items: flex-start; gap: 14px;
+          }
+          .feature-dot {
+            width: 36px; height: 36px; flex-shrink: 0;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+          }
+          .feature-text strong {
+            display: block;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+          }
+          .feature-text span {
+            color: rgba(255,255,255,.55);
+            font-size: 13px;
+          }
+
+          /* Right panel - form */
+          .panel-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 56px;
+            background: var(--white);
+          }
+
+          .login-box {
+            width: 100%;
+            max-width: 380px;
+          }
+
+          .login-header {
+            margin-bottom: 36px;
+          }
+          .login-header h2 {
+            font-family: 'Lora', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+          }
+          .login-header p { color: var(--muted); font-size: 14px; }
+
+          .form-group {
+            margin-bottom: 18px;
+          }
+          label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+          }
+          input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            background: var(--white);
+          }
+          input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+          }
+
+          .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s, transform .1s;
+            margin-top: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+          }
+          .btn-login:hover { background: var(--blue-dark); }
+          .btn-login:active { transform: scale(.98); }
+          .btn-login:disabled { opacity: .6; cursor: not-allowed; }
+
+          .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--red);
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+          }
+          .error-msg.show { display: block; }
+
+          .hint-box {
+            margin-top: 28px;
+            padding: 14px 16px;
+            background: var(--blue-light);
+            border-radius: 10px;
+            border-left: 3px solid var(--blue);
+          }
+          .hint-box p { font-size: 12.5px; color: #374151; margin-bottom: 4px; }
+          .hint-box strong { color: var(--blue); }
+
+          .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            display: none;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
+
+          @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+            .panel-right { padding: 40px 28px; }
+          }
+        </style>
+    </head>
+    <body>
+
+    <div class="panel-left">
+      <div class="brand">
+        <h1>PharmTrack</h1>
+        <p>Pharmacy Inventory Management System</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-dot">📊</div>
+          <div class="feature-text">
+            <strong>Real-time Dashboard</strong>
+            <span>Live stock levels, alerts and inventory value</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">⚠️</div>
+          <div class="feature-text">
+            <strong>Smart Alerts</strong>
+            <span>Low stock, expired and expiring-soon warnings</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">📈</div>
+          <div class="feature-text">
+            <strong>Inventory Reports</strong>
+            <span>Charts and breakdowns by category and status</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">👥</div>
+          <div class="feature-text">
+            <strong>User Management</strong>
+            <span>Role-based access for admin, pharmacist & cashier</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-right">
+      <div class="login-box">
+        <div class="login-header">
+          <h2>Welcome back</h2>
+        </div>
+
+        <div class="error-msg" id="error-msg"></div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+
+        <button class="btn-login" id="login-btn" onclick="doLogin()">
+          <div class="spinner" id="login-spinner"></div>
+          <span id="login-text">Log In</span>
+        </button>
+      </div>
+    </div>
+
+        <script>
+          fetch('api.php?action=me').then(r => r.json()).then(d => {
+            if (d.id) window.location.href = 'index.html';
+          }).catch(() => {});
+
+          document.getElementById('password').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+          });
+
+          async function doLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errEl    = document.getElementById('error-msg');
+            const btn      = document.getElementById('login-btn');
+            const spinner  = document.getElementById('login-spinner');
+            const txt      = document.getElementById('login-text');
+
+            errEl.classList.remove('show');
+            if (!username || !password) {
+              errEl.textContent = 'Please enter both username and password.';
+              errEl.classList.add('show');
+              return;
+            }
+
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            txt.textContent = 'Signing in…';
+
+            try {
+              const res  = await fetch('api.php?action=login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+              });
+              const data = await res.json();
+
+              if (data.error) {
+                errEl.textContent = data.error;
+                errEl.classList.add('show');
+              } else {
+                window.location.href = 'index.html';
+              }
+            } catch (e) {
+              errEl.textContent = 'Connection error. Please check the server.';
+              errEl.classList.add('show');
+            } finally {
+              btn.disabled = false;
+              spinner.style.display = 'none';
+              txt.textContent = 'Log In';
+            }
+          }
+        </script>
+    </body>
+</html>
