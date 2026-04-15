@@ -3,7 +3,7 @@ const API = 'api.php';
       let allMedicines = [];
       let allCategories = [];
 
-      // ── NAVIGATION ──────────────────────────────────────────────────────────────
+      // Navigation
       function showPage(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -28,7 +28,7 @@ const API = 'api.php';
 
       function refreshCurrentPage() { loadPage(currentPage); }
 
-      // ── API HELPER ───────────────────────────────────────────────────────────────
+      // API Helper
       async function api(action, method = 'GET', body = null) {
         const opts = { method, headers: { 'Content-Type': 'application/json' } };
         if (body) opts.body = JSON.stringify(body);
@@ -36,7 +36,7 @@ const API = 'api.php';
         return res.json();
       }
 
-      // ── TOAST ────────────────────────────────────────────────────────────────────
+      // Toast
       function toast(msg, type = 'info') {
         const el = document.createElement('div');
         el.className = `toast ${type}`;
@@ -45,7 +45,7 @@ const API = 'api.php';
         setTimeout(() => el.remove(), 3500);
       }
 
-      // ── MODAL ────────────────────────────────────────────────────────────────────
+      // Modal
       function openModal(id) { document.getElementById(id).classList.add('open'); }
       function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
@@ -55,7 +55,7 @@ const API = 'api.php';
         openModal('confirm-modal');
       }
 
-      // ── DASHBOARD ────────────────────────────────────────────────────────────────
+      // Dashboard
       async function loadDashboard() {
         const data = await api('dashboard');
 
@@ -124,7 +124,7 @@ const API = 'api.php';
         }
       }
 
-      // ── MEDICINES ────────────────────────────────────────────────────────────────
+      // Medicines
       async function loadMedicines() {
         const search   = document.getElementById('med-search')?.value || '';
         const category = document.getElementById('med-category-filter')?.value || '';
@@ -241,7 +241,7 @@ const API = 'api.php';
         });
       }
 
-      // ── CATEGORIES ───────────────────────────────────────────────────────────────
+      // Categories
       async function loadCategories(renderTable = false) {
         const data = await api('get_categories');
         allCategories = data;
@@ -313,7 +313,7 @@ const API = 'api.php';
         });
       }
 
-      // ── SALES ────────────────────────────────────────────────────────────────────
+      // Sales
       async function loadSales() {
         const dateFrom = document.getElementById('sales-date-from')?.value || '';
         const dateTo   = document.getElementById('sales-date-to')?.value   || '';
@@ -405,7 +405,7 @@ const API = 'api.php';
         if (currentPage === 'dashboard') loadDashboard();
       }
 
-      // ── HELPERS ──────────────────────────────────────────────────────────────────
+      // Helpers
       function populateSelect(id, items, valKey, labelKey, placeholder, labelFn = null) {
         const sel = document.getElementById(id);
         if (!sel) return;
@@ -417,5 +417,5 @@ const API = 'api.php';
         return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
       }
 
-      // ── INIT ─────────────────────────────────────────────────────────────────────
+      // Initialization
       loadDashboard();

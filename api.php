@@ -48,6 +48,32 @@ switch ($action) {
         echo json_encode($stats);
         break;
 
+        // Log In
+        case 'login':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $user = $data['username'] ?? '';
+            $pass = $data['password'] ?? '';
+
+            // Default credentials logic
+            if ($user === 'admin' && $pass === 'Admin@123') {
+                session_start();
+                $_SESSION['user_id'] = 1;
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['error' => 'Invalid username or password']);
+            }
+            break;
+        
+        case 'me':
+            session_start();
+            if (isset($_SESSION['user_id'])) {
+                echo json_encode(['id' => $_SESSION['user_id'], 'name' => 'Admin']);
+            } else {
+                echo 
+                json_encode(['id' => null]);
+            }
+            break;
+
     // Medicines
     case 'get_medicines':
         $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
