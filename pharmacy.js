@@ -3,6 +3,31 @@ const API = 'api.php';
       let allMedicines = [];
       let allCategories = [];
 
+      // Auth Check
+      async function checkAuth() {
+        try {
+          const res = await fetch(`${API}?action=me`);
+          const data = await res.json();
+          if (data.error) {
+            window.location.href = 'login.html';
+            return false;
+          }
+          const uName = document.getElementById('user-name');
+          const uAvatar = document.getElementById('user-avatar');
+          if (uName) uName.textContent = data.username;
+          if (uAvatar) uAvatar.textContent = data.username.charAt(0).toUpperCase();
+          return true;
+        } catch(e) {
+          window.location.href = 'login.html';
+          return false;
+        }
+      }
+
+      async function logout() {
+        await fetch(`${API}?action=logout`);
+        window.location.href = 'login.html';
+      }
+
       // Navigation
       function showPage(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -420,4 +445,6 @@ const API = 'api.php';
       }
 
       // Initialization
-      loadDashboard();
+      checkAuth().then(isLoggedIn => {
+        if (isLoggedIn) loadDashboard();
+      });
